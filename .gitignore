@@ -1,0 +1,21 @@
+# Dossier de l'environnement virtuel local
+.venv/
+
+# Cache Python généré automatiquement
+__Pycache__/
+
+# Fichiers compilés Python
+*.pyc
+
+# Fichier d'environnement contenant des secrets ou variables locales
+.env
+
+# Dossiers de cache de pytest
+.pytest_cache/
+
+# Dossiers d'IDE / éditeurs
+.idea/
+.vscode/
+
+# Fichiers systeme divers
+.DS_Store

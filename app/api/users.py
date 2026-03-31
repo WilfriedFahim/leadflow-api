@@ -1,5 +1,5 @@
 # Import du router FastAPI pour organiser les endpoints (routes) liées aux utilisateurs
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 # Import des schémas Pydantic pour la validation et la réponse
 from app.schemas.user import UserCreate, UserRead
@@ -15,13 +15,29 @@ fake_users_db: list[dict[str, int | str]] = []
 
 # Endpoint GET pour récupérer tous les utilisateurs
 @router.get("/")
-def get_users() -> list[dict]:
+def get_users() -> list[dict[str, int |str]]:
     """
-    Retourne une liste d'utilisateurs simulés (mock pour le moment).
-    Pour l'instant, les données sont stockées en mémoire.
-    Plus tard, on branchera PostgreSQL.
+    Retourne la liste de tous les utilisateurs simulés
     """
     return fake_users_db
+
+@router.get("/{user_id}", response_model=UserRead)
+def get_user(user_id: int)-> dict[str, int | str]:
+    """
+    Retourne un utilisateur spécifique à partir de son identifiant.
+    Si aucun utilisateur ne correspond à l'identifiant demandé,
+    on renvoie une erreur HTTP 404.
+    """
+
+    # Parcours de la fausse base pour chercher l'utilisateur correspondant
+    for user in fake_users_db:
+        # Vérifie si l'identifiant de l'utilisateur courant correspondant
+        if user["id"] == user_id:
+            # Retourne l'utilisateur trouvé
+            return user
+
+    # Si aucun utilisateur n'a été trouvé, on lève une erreur 404.
+    raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
 @router.post("/", response_model=UserRead, status_code=201)
 def create_user(user: UserCreate) -> dict[str, int | str]:

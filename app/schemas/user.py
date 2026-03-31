@@ -16,7 +16,7 @@ class UserCreate(BaseModel):
 class UserRead(BaseModel):
     """
     Schéma utilisé pour renvoyer un utilisateur au client.
-    One ne renvoie jamais le mot de passe
+    On ne renvoie jamais le mot de passe
     """
 
     # Identifiant de l'utilisateur

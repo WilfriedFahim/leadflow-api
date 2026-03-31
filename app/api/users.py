@@ -50,6 +50,14 @@ def create_user(user: UserCreate) -> dict[str, int | str]:
     * on renvoie seulement les données publiques.
     """
 
+    # Vérifie si l'émail existe déjà
+    for existing_user in fake_users_db:
+        if existing_user["email"] == str(user.email):
+            raise HTTPException(
+                status_code=400,
+                detail="Email déjà utilisé"
+            )
+
     # Création d'un nouvel utilisateur simulé
     new_user = {
         "id": len(fake_users_db) + 1,
@@ -61,3 +69,17 @@ def create_user(user: UserCreate) -> dict[str, int | str]:
 
     # Retourne uniquement les données publiques de l'utilisateur
     return new_user
+
+@router.delete("/{user_id}", status_code=204)
+def delete_user(user_id: int):
+    """
+    Supprime un utilisateur par son ID
+    """
+
+    for index, user in enumerate(fake_users_db):
+        if user["id"] == user_id:
+            #Supprime l'utilisateur de la liste
+            fake_users_db.pop(index)
+            return
+
+    raise HTTPException(status_code=404, detail="Utilisateur introuvable")

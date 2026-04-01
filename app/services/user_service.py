@@ -27,3 +27,39 @@ def create_user_service(fake_users_db: List[Dict], email: str) -> Dict:
     fake_users_db.append(new_user)
 
     return new_user
+
+
+def update_user_email_service(fake_users_db: List[Dict], user_id: int, new_email: str) -> Dict:
+    """
+    Met à jour l'émail d'un utilisateur.
+    Cette fonction contient uniquement la logique métier :
+    * vérification existence user
+    * vérification doublon email
+    * mise à jour
+    """
+
+    # On cherche l'utilisateur
+    for user in fake_users_db:
+        if user["id"] == user_id:
+
+            # Vérifie doublon email
+            for existing_user in fake_users_db:
+                if (
+                    existing_user["email"] == new_email
+                    and existing_user["id"] != user_id
+                ):
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Email déjà utilisé"
+                    )
+
+            # Mise à jour
+            user["email"] = new_email
+
+            return user
+
+    # Si user non trouvé
+    raise HTTPException(
+        status_code=404,
+        detail="Utilisateur introuvable"
+    )

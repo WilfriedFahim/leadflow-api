@@ -6,6 +6,7 @@ from app.schemas.user import UserCreate, UserRead, UserUpdate
 
 # Import local
 from app.services.user_service import (
+    UserDict,
     create_user_service,
     update_user_email_service,
     get_user_service,
@@ -20,11 +21,11 @@ router = APIRouter(
 )
 
 # Faux stockage temporaire en mémoire pour simuler une base de données
-fake_users_db: list[dict[str, int | str]] = []
+fake_users_db: list[UserDict] = []
 
 # Endpoint GET pour récupérer tous les utilisateurs
 @router.get("/")
-def get_users() -> list[dict[str, int |str]]:
+def get_users() -> list[UserDict]:
     """
     Endpoint HTTP → délègue la logique au service
     Retourne la liste de tous les utilisateurs simulés
@@ -32,7 +33,7 @@ def get_users() -> list[dict[str, int |str]]:
     return fake_users_db
 
 @router.get("/{user_id}", response_model=UserRead)
-def get_user(user_id: int)-> dict[str, int | str]:
+def get_user(user_id: int)-> UserDict:
     """
     Endpoint HTTP → délègue la logique au service
     Retourne un utilisateur spécifique à partir de son identifiant.
@@ -40,7 +41,7 @@ def get_user(user_id: int)-> dict[str, int | str]:
     return get_user_service(fake_users_db, user_id)
 
 @router.post("/", response_model=UserRead, status_code=201)
-def create_user(user: UserCreate) -> dict[str, int | str]:
+def create_user(user: UserCreate) -> UserDict:
     """
     Endpoint HTTP → délègue la logique au service
     """
@@ -51,7 +52,7 @@ def create_user(user: UserCreate) -> dict[str, int | str]:
 
 
 @router.patch("/{user_id", response_model=UserRead)
-def update_user(user_id: int, user_update: UserUpdate) -> dict[str, int | str]:
+def update_user(user_id: int, user_update: UserUpdate) -> UserDict:
     """
     Endpoint HTTP → délègue la logique au service
     Met à jour partiellement un utilisateur.

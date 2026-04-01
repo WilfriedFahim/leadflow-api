@@ -7,9 +7,16 @@ from typing import List, Dict
 
 def create_user_service(fake_users_db: List[Dict], email: str) -> Dict:
     """
-    Service qui gère la création d'un utilisateur.
-    On sépare la logique métier de la route FastAPI.
+    Créait un utilisateur
+    * Vérifie les doublons
+    * Ajoute l'utilisateur
     """
+
+    if not email:
+        raise HTTPException(
+            status_code=400,
+            detail="Email obligatoire"
+        )
 
     # Vérifie si l'émail existe déjà
     for user in fake_users_db:
@@ -19,6 +26,7 @@ def create_user_service(fake_users_db: List[Dict], email: str) -> Dict:
                 detail="Email déjà utilisé"
             )
 
+    # Création utilisateur
     new_user = {
         "id": len(fake_users_db) + 1,
         "email": email,

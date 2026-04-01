@@ -4,6 +4,10 @@ from fastapi import APIRouter, HTTPException
 # Import des schémas Pydantic pour la validation et la réponse
 from app.schemas.user import UserCreate, UserRead, UserUpdate
 
+# Import local
+from app.services.user_service import create_user_service
+
+
 # Création d'un routeur dédié aux utilisateurs
 router = APIRouter(
     prefix="/users", #Préfix commun à toutes les routes de ce fichier
@@ -42,33 +46,12 @@ def get_user(user_id: int)-> dict[str, int | str]:
 @router.post("/", response_model=UserRead, status_code=201)
 def create_user(user: UserCreate) -> dict[str, int | str]:
     """
-    Crée un utilisateur en utilisant les données validées par Pydantic.
-
-    Pour l'instant :
-    * on simule la création
-    * on ne stocke pas le mot de passe
-    * on renvoie seulement les données publiques.
+    Endpoint HTTP → délègue la logique au service
     """
-
-    # Vérifie si l'émail existe déjà
-    for existing_user in fake_users_db:
-        if existing_user["email"] == str(user.email):
-            raise HTTPException(
-                status_code=400,
-                detail="Email déjà utilisé"
-            )
-
-    # Création d'un nouvel utilisateur simulé
-    new_user = {
-        "id": len(fake_users_db) + 1,
-        "email": str(user.email),
-    }
-
-    # Ajout dans notre faux stockage temporaire
-    fake_users_db.append(new_user)
-
-    # Retourne uniquement les données publiques de l'utilisateur
-    return new_user
+    return create_user_service(
+        fake_users_db=fake_users_db,
+        email=str(user.email)
+    )
 
 
 @router.patch("/{user_id", response_model=UserRead)

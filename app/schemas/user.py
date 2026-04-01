@@ -24,3 +24,12 @@ class UserRead(BaseModel):
 
     #Adresse email de l'utilisateur
     email:  EmailStr
+
+class UserUpdate(BaseModel):
+    """
+    Schéma utilisé pour une mise à jour partielle d'un utilisateur.
+    Tous les champs sont optionnels, car avec PATCH,
+    on peut envoyer seulement les données à modifier.
+    """
+    #Email optionnel : il peut être absent de la requête
+    email: EmailStr | None = None

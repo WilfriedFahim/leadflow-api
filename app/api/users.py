@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException
 
 # Import des schémas Pydantic pour la validation et la réponse
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import UserCreate, UserRead, UserUpdate
 
 # Création d'un routeur dédié aux utilisateurs
 router = APIRouter(
@@ -69,6 +69,40 @@ def create_user(user: UserCreate) -> dict[str, int | str]:
 
     # Retourne uniquement les données publiques de l'utilisateur
     return new_user
+
+
+@router.patch("/{user_id", response_model=UserRead)
+def update_user(user_id: int, user_update: UserUpdate) -> dict[str, int | str]:
+    """
+    Met à jour partiellement un utilisateur.
+
+    Avec PATCH :
+    * on peut envoyer seulement les champs à modifier
+    * ici, on gère uniquement l'émail pour l'instant.
+    """
+    for user in fake_users_db:
+        if user["id"] == user_id:
+            # Si un nouvel email est fourni, on vérifie d'abord qu'il n'est pas déjà utilisé
+                if user_update.email is not None:
+                    new_email = str(user_update.email)
+
+                    for existing_user in fake_users_db:
+                        if (
+                            existing_user["email"] == new_email
+                            and  existing_user["id"] != user_id
+                        ):
+                            raise HTTPException(
+                                status_code=400,
+                                detail="Email déjà utilisé",
+                            )
+                    # Mise à jour de l'émail de l'utilisateur trouvé
+                    user["email"] = new_email
+
+                # Retourne l'utilisateur mis à jour
+                return user
+
+    raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+
 
 @router.delete("/{user_id}", status_code=204)
 def delete_user(user_id: int):

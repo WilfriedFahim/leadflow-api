@@ -61,11 +61,16 @@ def create_user(user: UserCreate) -> dict[str, int | str]:
 def update_user(user_id: int, user_update: UserUpdate) -> dict[str, int | str]:
     """
     Endpoint HTTP → délègue la logique au service
+    Met à jour partiellement un utilisateur.
+    On vérifie que l'utilisateur envoie au moins un champ à modifier.
     """
 
     # On vérifie que l'émail est fourni
     if user_update.email is None:
-        return {"id": user_id, "email": ""}
+        raise HTTPException(
+            status_code=400,
+            detail="Aucune données à mettre à jour"
+        )
 
     return update_user_email_service(
         fake_users_db=fake_users_db,

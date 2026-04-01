@@ -4,6 +4,9 @@ from fastapi import HTTPException
 # Import de TypeDict pour typer plus précisément la structure d'un utilisateur
 from typing import TypedDict
 
+# Import de BaseModel pour créer des schémas de validation de données
+from pydantic import EmailStr
+
 class UserDict(TypedDict):
     """
     Représente la structure d'un utilisateur stocké
@@ -17,7 +20,7 @@ class UserDict(TypedDict):
     id: int
     email: str
 
-def create_user_service(fake_users_db: list[UserDict], email: str) -> UserDict:
+def create_user_service(fake_users_db: list[UserDict], email: EmailStr) -> UserDict:
     """
     Créait un utilisateur
     * Vérifie les doublons
@@ -42,7 +45,7 @@ def create_user_service(fake_users_db: list[UserDict], email: str) -> UserDict:
     # Construit le nouvel utilisateur
     new_user: UserDict = {
         "id": len(fake_users_db) + 1,
-        "email": email,
+        "email": str(email),
     }
 
     #Ajoute l'utilisateur crée

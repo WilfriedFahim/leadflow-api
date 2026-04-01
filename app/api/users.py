@@ -44,10 +44,11 @@ def get_user(user_id: int)-> UserDict:
 def create_user(user: UserCreate) -> UserDict:
     """
     Endpoint HTTP → délègue la logique au service
+    Crée un nouvel utilisateur à partir des données validées par Pydantic.
     """
     return create_user_service(
         fake_users_db=fake_users_db,
-        email=str(user.email)
+        email=user.email # plus besoin de str()
     )
 
 

@@ -1,3 +1,7 @@
-fastapi
-uvicorn[standard]
-pydantic[email]
+fastapi             # Framework backend principal pour crée l'API
+uvicorn[standard]   # Serveur ASGI pour lancer l'application FastAPI
+pydantic[email]     # Validation des données et des schémas utilisés par FastAPI
+email-validator     # Dépendance nécessaire pour utiliser EmailStr avec Pydantic
+sqlalchemy          # ORM Python pour communiquer proprement avec PostgreSQL
+psycopg[binary]     # Driver PostgreSQL moderne utilisé par SQLAlchemy
+python-dotenv       # Permet de charger les variables d'environnement depuis un fichier .Env

@@ -4,17 +4,28 @@ from fastapi import FastAPI
 # Import du router users
 from app.api.users import router as users_router
 
-# création de l'application FASTAPI
-# Le paramètre title permet d'afficher un nom propre dans Swagger /docs
+# Importe la fonction d'initialisation des tables
+from app.db.init_db import init_db
+
+# Crée l'application fastAPI'
 app = FastAPI(title="LeadFlow API")
 
-# Inclusion des routes users (utilisateurs)
+# Déclaration d'une route HTTP GET sur l'URL racine "/"
+@app.on_event("startup")
+def on_startup() -> None:
+    """
+    Fonction exécutée automatique au démarrage.
+    Son rôle ici :
+    * Créer les tables SQLAlchemy si elles n'existent pas encore
+    """
+    init_db()
+
+# Branche le routeur users sur l'application
 app.include_router(users_router)
 
-# Déclaration d'une route HTTP GET sur l'URL racine "/"
 @app.get("/")
 def read_root() -> dict[str, str]:
     """
-    Route racine pour vérifier que l'API fonctionne.
+    Route racine simple pour verifier que l'application tourne
     """
-    return{"message": "LeadFlow API is running"}
+    return {"message": "LeadFlow API is running!"}

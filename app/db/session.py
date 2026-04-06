@@ -1,11 +1,7 @@
-# Importe create_engine pour créer la connexion à la base
-from sqlalchemy import create_engine
 
-# Importe Session et sessionmaker pour gérer les sessions SQLAlchemy
-from sqlalchemy.orm import sessionmaker, Session
-
-#Importe la configuration centralisée
-from app.core.config import settings
+from sqlalchemy import create_engine             # Importe create_engine pour créer la connexion à la base
+from sqlalchemy.orm import sessionmaker, Session # Importe Session et sessionmaker pour gérer les sessions SQLAlchemy
+from app.core.config import settings             # Importe la configuration centralisée
 
 # Crée le moteur SQLAlchemy à partir de l'URL PostgreSQL
 engine = create_engine(
@@ -14,7 +10,7 @@ engine = create_engine(
 )
 
 # Crée une fabrique de sessions SQLAlchemy
-#C Chaque requête FastAPI pourra obtenir sa propre session
+# Chaque requête FastAPI pourra obtenir sa propre session
 SessionLocal = sessionmaker(
     bind=engine,
     autocommit=False,

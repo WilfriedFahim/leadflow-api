@@ -1,125 +1,34 @@
-# Import des exceptions HTTP pour gérer les erreurs
-from fastapi import HTTPException
+from fastapi import HTTPException      # Import des exceptions HTTP pour gérer les erreurs
+from app.models.user import User       # Import du modèle SQLAlchemy User
+from sqlalchemy.orm import Session     # Import de BaseModel pour créer des schémas de validation de données
 
-# Import de TypeDict pour typer plus précisément la structure d'un utilisateur
-from typing import TypedDict
-
-# Import de BaseModel pour créer des schémas de validation de données
-from pydantic import EmailStr
-
-class UserDict(TypedDict):
+def create_user_service(
+        db: Session,  # On reçoit la session DB
+        email: str
+) -> User:
     """
-    Représente la structure d'un utilisateur stocké
-    dans notre fausse base de mémoire.
+    Crée un utilisateur en base PostgreSQL.
 
-    Pour l'instant, un utilisateur possède :
-    * un identifiant entier
-    * un émail
+    Cette fonction :
+    * vérifie que l'émail n'existe pas déjà
+    * crée un utilisateur SQLAlchemy
+    * l'enregistre en base.
     """
 
-    id: int
-    email: str
+    # Vérifie que l'email n'est pas vide
+    existing_user = db.query(User).filter(User.email == email).first()
 
-def create_user_service(fake_users_db: list[UserDict], email: EmailStr) -> UserDict:
-    """
-    Créait un utilisateur
-    * Vérifie les doublons
-    * Ajoute l'utilisateur
-    """
-
-    #Vérifie que l'email n'est pas vide
-    if not email:
+    if existing_user:
         raise HTTPException(
             status_code=400,
-            detail="Email obligatoire"
+            detail="Email déjà utilisé"
         )
 
-    # Vérifie si l'émail existe déjà
-    for user in fake_users_db:
-        if user["email"] == email:
-            raise HTTPException(
-                status_code=400,
-                detail="Email déjà utilisé"
-            )
-
-    # Construit le nouvel utilisateur
-    new_user: UserDict = {
-        "id": len(fake_users_db) + 1,
-        "email": str(email),
-    }
-
-    #Ajoute l'utilisateur crée
-    fake_users_db.append(new_user)
+    new_user = User(email=email)  # Création de l'objet utilisateur (Pas un Dict)
+    db.add(new_user)              # Ajout en base
+    db.commit()                   # Sauvegarde réelle en DB
+    db.refresh(new_user)          # Recharge l'objet avec les données DB (ex : id auto)
 
     return new_user
 
 
-def update_user_email_service(fake_users_db: list[UserDict], user_id: int, new_email: str) -> UserDict:
-    """
-    Met à jour l'émail d'un utilisateur.
-    """
-
-    if not new_email:
-        raise HTTPException(
-            status_code=400,
-            detail="Email obligatoire",
-        )
-
-    # On cherche l'utilisateur à modifier
-    for user in fake_users_db:
-        if user["id"] == user_id:
-
-            # Vérifie doublon email
-            for existing_user in fake_users_db:
-                if (
-                    existing_user["email"] == new_email
-                    and existing_user["id"] != user_id
-                ):
-                    raise HTTPException(
-                        status_code=400,
-                        detail="Email déjà utilisé"
-                    )
-
-            # Mise à jour de l'email de l'utilisateur trouvé
-            user["email"] = new_email
-
-            return user
-
-    # Si utilisateur non trouvé
-    raise HTTPException(
-        status_code=404,
-        detail="Utilisateur introuvable"
-    )
-
-
-def get_user_service(fake_users_db: list[UserDict], user_id: int) -> UserDict:
-    """
-    Retourne un utilisateur à partir de son identifiant.
-    Si l'utilisateur n'existe pas, on lève une erreur 404.
-    """
-
-    # On parcourt la fausse base pour chercher l'utilisateur demandé
-    for user in fake_users_db:
-        if user["id"] == user_id:
-            return user
-
-    # Si aucun utilisateur trouvé : on renvoie une erreur 404.
-    raise HTTPException(
-        status_code=404,
-        detail="Utilisateur introuvable"
-    )
-
-def delete_user_service(fake_users_db: list[UserDict], user_id: int) -> None:
-    """
-    Supprime un utilisateur par son ID.
-    """
-
-    for index, user in enumerate(fake_users_db):
-        if user["id"] == user_id:
-            fake_users_db.pop(index)
-            return
-
-    raise HTTPException(
-        status_code=404,
-        detail="Utilisateur introuvable"
-    )

@@ -4,7 +4,7 @@ from sqlalchemy import String, Integer
 # Importe les outils modernes de mapping SQLAlchemy 2.0
 from sqlalchemy.orm import Mapped, mapped_column
 
-#Import la classe de base commune à tous les modèles
+# Import la classe de base commune à tous les modèles
 from app.db.base import Base
 
 class User(Base):

@@ -1,14 +1,6 @@
-# Importe le module os pour lire les variables d'environnement
-import os
-from pathlib import Path
-
-# Importe load_dotenv pour charger automatiquement le fichier .env
-from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-
-# Charge les variables d'environnement depuis la racine du projet.
-load_dotenv(BASE_DIR / ".env")
+import os                      # Importe le module os pour lire les variables d'environnement
+from dotenv import load_dotenv # Importe load_dotenv pour charger automatiquement le fichier .env
+load_dotenv()                  # Charge les variables d'environnement depuis la racine du projet.
 
 class Settings:
     """
@@ -24,6 +16,6 @@ class Settings:
         "postgresql+psycopg://postgres:postgres@localhost:5432/leadflow_db",
     )
 
-# Crée une instance de configuration réutilisable dans tout le projet
+
 # IMPORTANT : cette ligne doit être en dehors de la classe
-settings = Settings()
+settings = Settings() # Crée une instance de configuration réutilisable dans tout le projet

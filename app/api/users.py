@@ -3,6 +3,7 @@ from app.schemas.user import UserCreate, UserRead             # Import des sché
 from app.services.user_service import (                       # Import du service
     create_user_service, get_user_service
 )
+from app.models.user import User                              # Mon modèle ORM
 from app.db.session import get_db                             # Import de la session DB
 from sqlalchemy.orm import Session                            # Import du type Session
 
@@ -14,24 +15,24 @@ router = APIRouter(
 
 
 @router.post("/", response_model=UserRead, status_code=201)
-def get_users(
-        user: UserCreate,
-        db: Session = Depends(get_db)   # Injection DB
-):
+def create_user(
+    user: UserCreate,
+    db: Session = Depends(get_db),   # Injection DB
+) -> User:
     """
     Endpoint HTTP → délègue la logique au service
     Retourne la liste de tous les utilisateurs simulés
     """
     return create_user_service(
         db=db,
-        email=user.email
+        email=user.email,
     )
 
-@router.get("/user_id", response_model=UserRead)
+@router.get("/{user_id}", response_model=UserRead)
 def get_user(
-        user_id: int,
-db: Session = Depends(get_db)
-):
+    user_id: int,
+    db: Session = Depends(get_db),
+)-> User:
     """
     Endpoint GET connecté à PostgreSQL
     """

@@ -34,18 +34,23 @@ def create_user_service(
 
 def get_user_service(db: Session, user_id: int) -> User:
     """
-    Récupère un utilisateur depuis PostgreSQL.
+    Récupère un utilisateur depuis PostgreSQL à partir de son identifiant.
 
-    Etapes :
-    1. Interroger la DB avec db.query
-    2. Filtrer sur l'id
-    3. Vérifier si on trouve l'utilisateur
+    Étapes :
+    1. Interroger la table users via le modèle User
+    2. Filtrer sur l'identifiant
+    3. Récupérer le premier résultat
+    4. Lever une erreur 404 si aucun utilisateur n'est trouvé
     """
 
-    user = db.query(User).filter(User.id == user_id).first()    # Recherche en base de donnée
+    # Exécute une requête SQLAlchemy :
+    # * db.query(User) cible la table users via le modèle User
+    # * filter(User.id == user_id) ajoute la condition WHERE id = ...
+    # * first() renvoie le premier résultat ou None
+    user = db.query(User).filter(User.id == user_id).first()
 
-    # Si on ne trouve pas l'utilisateur → erreur 404.
-    if not user:
+    # Si aucun utilisateur n'est trouvé, first() renvoie None
+    if user is None:
         raise HTTPException(
             status_code=404,
             detail="Utilisateur introuvable"

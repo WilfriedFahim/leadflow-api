@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends                        # Import du router FastAPI pour organiser les endpoints (routes) liées aux utilisateurs
-from app.schemas.user import UserCreate, UserRead            # Import des schémas Pydantic pour la validation et la réponse
-from app.services.user_service import create_user_service     # Import du service
+from app.schemas.user import UserCreate, UserRead             # Import des schémas Pydantic pour la validation et la réponse
+from app.services.user_service import (                       # Import du service
+    create_user_service, get_user_service
+)
 from app.db.session import get_db                             # Import de la session DB
 from sqlalchemy.orm import Session                            # Import du type Session
 
@@ -24,3 +26,13 @@ def get_users(
         db=db,
         email=user.email
     )
+
+@router.get("/user_id", response_model=UserRead)
+def get_user(
+        user_id: int,
+db: Session = Depends(get_db)
+):
+    """
+    Endpoint GET connecté à PostgreSQL
+    """
+    return get_user_service(db=db, user_id=user_id)

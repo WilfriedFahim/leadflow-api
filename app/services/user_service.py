@@ -32,3 +32,23 @@ def create_user_service(
     return new_user
 
 
+def get_user_service(db: Session, user_id: int) -> User:
+    """
+    Récupère un utilisateur depuis PostgreSQL.
+
+    Etapes :
+    1. Interroger la DB avec db.query
+    2. Filtrer sur l'id
+    3. Vérifier si on trouve l'utilisateur
+    """
+
+    user = db.query(User).filter(User.id == user_id).first()    # Recherche en base de donnée
+
+    # Si on ne trouve pas l'utilisateur → erreur 404.
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Utilisateur introuvable"
+        )
+
+    return user

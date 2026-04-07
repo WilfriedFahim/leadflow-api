@@ -27,7 +27,7 @@ def create_user_service(
     new_user = User(email=email)  # Création de l'objet utilisateur (Pas un Dict)
     db.add(new_user)              # Ajout en base
     db.commit()                   # Sauvegarde réelle en DB
-    db.refresh(new_user)          # Recharge l'objet avec les données DB (ex : id auto)
+    db.refresh(new_user)          # Recharge l'objet avec les données depuis la DB après commit (ex : id auto)
 
     return new_user
 
@@ -57,3 +57,17 @@ def get_user_service(db: Session, user_id: int) -> User:
         )
 
     return user
+
+def get_users_service(db: Session) -> list[User]:
+    """
+    Récupère tous les utilisateurs en base de données.
+
+    Étapes :
+    1. Interroger la table users
+    2. Récupérer tous les résultats
+    """
+
+    # Requête SQLAlchemy
+    users = db.query(User).all()
+
+    return users

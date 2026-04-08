@@ -1,5 +1,5 @@
 # Import de BaseModel pour créer des schémas de validation de données
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 class UserCreate(BaseModel):
     """
@@ -24,6 +24,8 @@ class UserRead(BaseModel):
 
     #Adresse email de l'utilisateur
     email:  EmailStr
+
+    model_config = ConfigDict(from_attributes=True)
 
 class UserUpdate(BaseModel):
     """

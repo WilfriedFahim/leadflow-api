@@ -24,10 +24,10 @@ def create_user_service(
             detail="Email déjà utilisé"
         )
 
-    new_user = User(email=email)  # Création de l'objet utilisateur (Pas un Dict)
-    db.add(new_user)              # Ajout en base
-    db.commit()                   # Sauvegarde réelle en DB
-    db.refresh(new_user)          # Recharge l'objet avec les données depuis la DB après commit (ex : id auto)
+    new_user = User(email=email)    # Création de l'objet utilisateur (Pas un Dict)
+    db.add(new_user)                # Ajout en base
+    db.commit()                     # Sauvegarde réelle en DB
+    db.refresh(new_user)            # Recharge l'objet avec les données depuis la DB après commit (ex : id auto)
 
     return new_user
 
@@ -58,16 +58,19 @@ def get_user_service(db: Session, user_id: int) -> User:
 
     return user
 
-def get_users_service(db: Session) -> list[User]:
+def get_users_service(db: Session, limit: int =50, offset: int = 0) -> list[User]:
     """
-    Récupère tous les utilisateurs en base de données.
+    Récupère une liste paginée d'utilisateur
 
     Étapes :
-    1. Interroger la table users
-    2. Récupérer tous les résultats
+    * limit : nombre maximum d'utilisateurs à renvoyer
+    * offset : nombre d'utilisateurs à ignorer avant de commencer
     """
 
-    # Requête SQLAlchemy
-    users = db.query(User).all()
+
+    query = db.query(User)          # Construit la requête SQLAlchemy sur la table usersRequête SQLAlchemy
+    query = query.offset(offset)    # Applique l'offset pour ignorer les premiers résultats
+    query = query.limit(limit)      # Applique la limite pour éviter de tout renvoyer d'un coup
+    users = query.all()             # Exécute la requête et renvoie la liste des utilisateurs
 
     return users

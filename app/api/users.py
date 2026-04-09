@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, Query                   # Import du router FastAPI pour organiser les endpoints (routes) liées aux utilisateurs
-
-from app.models import User
-from app.schemas.user import UserCreate, UserRead               # Import des schémas Pydantic pour la validation et la réponse
-from app.services.user_service import (                         # Import du service
-    create_user_service, get_user_service, get_users_service,
-)
-from app.models.user import User                                # Mon modèle ORM
-from app.db.session import get_db                               # Import de la session DB
 from sqlalchemy.orm import Session                              # Import du type Session
+from app.schemas.user import UserCreate, UserRead               # Import des schémas Pydantic pour la validation et la réponse
+from app.models.user import User                                # Mon modèle ORM
+from app.services.user_service import (                         # Import des services liés à la logique métier
+    create_user_service,
+    get_user_service,
+    get_users_service,
+    delete_user_service,
+)
+from app.db.session import get_db                               # Import de la session DB
+
 
 # Création d'un routeur dédié aux utilisateurs
 router = APIRouter(
@@ -62,4 +64,21 @@ def get_user(
     return get_user_service(
         db=db,
         user_id=user_id
+    )
+
+@router.delete("/{user_id}", status_code=204)
+def delete_user(
+        user_id: int,
+        db: Session = Depends(get_db),
+) -> None:
+    """
+    Supprime un utilisateur par son identifiant.
+
+    Si l'utilisateur n'existe pas, le service renvoie une erreur 404.
+    Si tout va bien, l'API renvoie 204 No Content.
+    """
+
+    delete_user_service(
+        db=db,
+        user_id=user_id,
     )

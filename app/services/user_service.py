@@ -74,3 +74,30 @@ def get_users_service(db: Session, limit: int =50, offset: int = 0) -> list[User
     users = query.all()             # Exécute la requête et renvoie la liste des utilisateurs
 
     return users
+
+def delete_user_service(db: Session, user_id: int) -> None:
+    """
+    Supprime un utilisateur en base PostgreSQL à partir de son identifiant.
+
+    Étapes :
+    1. Chercher l'utilisateur
+    2. Lever une erreur 404 s'il n'existe pas
+    3. Le supprimer de la session
+    4. Commit pour rendre la suppression effective en base de donnée
+    """
+
+    # On cherche l'utilisateur à supprimer
+    user = db.query(User).filter(User.id == user_id).first()
+
+    # Si aucun utilisateur n'est trouvé, on renvoie une erreur 404
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Utilisateur introuvable",
+        )
+
+    # Marque l'utilisateur pour suppression dans la session SQLAlchemy
+    db.delete(user)
+
+    # Valide la suppression en base
+    db.commit()

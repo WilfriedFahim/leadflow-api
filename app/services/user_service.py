@@ -89,7 +89,7 @@ def delete_user_service(db: Session, user_id: int) -> None:
     # On cherche l'utilisateur à supprimer
     user = db.query(User).filter(User.id == user_id).first()
 
-    # Si aucun utilisateur n'est trouvé, on renvoie une erreur 404
+    # Si aucun utilisateur n'est trouvé, on renvoie une erreur 404.
     if user is None:
         raise HTTPException(
             status_code=404,
@@ -101,3 +101,36 @@ def delete_user_service(db: Session, user_id: int) -> None:
 
     # Valide la suppression en base
     db.commit()
+
+def update_user_service(db: Session, user_id: int, email: str) -> User:
+    """
+    Met à jour l'émail utilisateur.
+
+    Etapes :
+    1. Vérifier que l'utilisateur existe
+    2. Vérifier que le nouvel email n'est pas déjà utilisé
+    3. Modifier l'utilisateur
+    4. Commit + refresh
+    """
+
+    # Vérifie que l'utilisateur existe
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Utilisateur introuvable",
+        )
+
+    # Vérifie que l'émail n'est pas déjà utilisé par un autre user
+    existing_user = db.query(User).filter(User.email == email).first()
+
+    if existing_user and existing_user.id != user_id:
+        raise HTTPException(
+            status_code=404,
+            detail="Email déjà utilisé",
+        )
+
+    user.email = email  # Mise à jour
+    db.commit()         # Persistance de la db
+    db.refresh(user)    # Recharger l'objet apres la persistance

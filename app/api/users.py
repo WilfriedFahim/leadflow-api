@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, Query                   # Import du router FastAPI pour organiser les endpoints (routes) liées aux utilisateurs
 from sqlalchemy.orm import Session                              # Import du type Session
-from app.schemas.user import UserCreate, UserRead               # Import des schémas Pydantic pour la validation et la réponse
+from app.schemas.user import UserCreate, UserRead, UserUpdate   # Import des schémas Pydantic pour la validation et la réponse
 from app.models.user import User                                # Mon modèle ORM
 from app.services.user_service import (                         # Import des services liés à la logique métier
     create_user_service,
     get_user_service,
     get_users_service,
     delete_user_service,
+    update_user_service,
 )
 from app.db.session import get_db                               # Import de la session DB
 
@@ -81,4 +82,25 @@ def delete_user(
     delete_user_service(
         db=db,
         user_id=user_id,
+    )
+@router.patch("/{user_id}", response_model=UserRead)
+def update_user(
+        user_id: int,
+        user: UserUpdate,
+        db: Session = Depends(get_db),
+):
+    """
+    Met à jour un utilisateur.
+
+    Exemple :
+    PATCH /users/1
+    {
+        "email" : "new@email.com"
+    }
+    """
+
+    return update_user_service(
+        db=db,
+        user_id=user_id,
+        email=user.email,
     )

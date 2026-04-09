@@ -1,5 +1,4 @@
-# Import de BaseModel pour créer des schémas de validation de données
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict                # Import de BaseModel pour créer des schémas de validation de données
 
 class UserCreate(BaseModel):
     """
@@ -7,11 +6,8 @@ class UserCreate(BaseModel):
     lors de la création d'un utilisateur
     """
 
-    # Adresse email obligatoire avec validation automatique du format
-    email: EmailStr
-
-    # Mot de passe obligatoire
-    password: str
+    email: EmailStr                     # Adresse email obligatoire avec validation automatique du format
+    password: str                       # Mot de passe obligatoire
 
 class UserRead(BaseModel):
     """
@@ -19,11 +15,8 @@ class UserRead(BaseModel):
     On ne renvoie jamais le mot de passe
     """
 
-    # Identifiant de l'utilisateur
-    id: int
-
-    #Adresse email de l'utilisateur
-    email:  EmailStr
+    id: int                             # Identifiant de l'utilisateur
+    email:  EmailStr                    # Adresse email de l'utilisateur
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -33,5 +26,5 @@ class UserUpdate(BaseModel):
     Tous les champs sont optionnels, car avec PATCH,
     on peut envoyer seulement les données à modifier.
     """
-    #Email optionnel : il peut être absent de la requête
-    email: EmailStr | None = None
+
+    email: EmailStr | None = None       # Email optionnel : il peut être absent de la requête

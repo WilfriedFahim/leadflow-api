@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, ConfigDict                # Import de BaseModel pour créer des schémas de validation de données
+from typing import Optional
 
 class UserCreate(BaseModel):
     """
@@ -27,4 +28,4 @@ class UserUpdate(BaseModel):
     on peut envoyer seulement les données à modifier.
     """
 
-    email: EmailStr | None = None       # Email optionnel : il peut être absent de la requête
+    email: Optional[EmailStr | None] = None       # Email optionnel : il peut être absent de la requête

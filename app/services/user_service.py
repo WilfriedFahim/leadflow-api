@@ -102,9 +102,10 @@ def delete_user_service(db: Session, user_id: int) -> None:
     # Valide la suppression en base
     db.commit()
 
-def update_user_service(db: Session, user_id: int, email: str) -> User:
+def update_user_service(db: Session, user_id: int, email: str | None ) -> User:
     """
     Met à jour l'émail utilisateur.
+    On accepte un email optionnel.
 
     Etapes :
     1. Vérifier que l'utilisateur existe
@@ -121,16 +122,19 @@ def update_user_service(db: Session, user_id: int, email: str) -> User:
             status_code=404,
             detail="Utilisateur introuvable",
         )
+    if email is not None:
 
-    # Vérifie que l'émail n'est pas déjà utilisé par un autre user
-    existing_user = db.query(User).filter(User.email == email).first()
+        # Vérifie que l'émail n'est pas déjà utilisé par un autre user
+        existing_user = db.query(User).filter(User.email == email).first()
 
-    if existing_user and existing_user.id != user_id:
-        raise HTTPException(
-            status_code=404,
-            detail="Email déjà utilisé",
-        )
+        if existing_user and existing_user.id != user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Email déjà utilisé",
+            )
+        user.email = email  # Mise à jour
 
-    user.email = email  # Mise à jour
     db.commit()         # Persistance de la db
     db.refresh(user)    # Recharger l'objet apres la persistance
+
+    return user

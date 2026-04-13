@@ -90,13 +90,7 @@ def update_user(
         db: Session = Depends(get_db),
 ):
     """
-    Met à jour un utilisateur.
-
-    Exemple :
-    PATCH /users/1
-    {
-        "email" : "new@email.com"
-    }
+    Met à jour partielle d'un utilisateur.
     """
 
     return update_user_service(

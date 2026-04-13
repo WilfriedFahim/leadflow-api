@@ -13,6 +13,7 @@ from app.services.user_service import (                         # Import des ser
     get_users_service,
     delete_user_service,
     update_user_service,
+    login_user_service,
 )
 from app.db.session import get_db                               # Import de la session DB
 

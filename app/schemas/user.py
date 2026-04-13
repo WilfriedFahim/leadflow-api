@@ -28,4 +28,8 @@ class UserUpdate(BaseModel):
     on peut envoyer seulement les données à modifier.
     """
 
-    email: Optional[EmailStr | None] = None       # Email optionnel : il peut être absent de la requête
+    email: Optional[EmailStr] = None       # Email optionnel : il peut être absent de la requête
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str

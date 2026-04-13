@@ -1,11 +1,9 @@
 from fastapi import HTTPException      # Import des exceptions HTTP pour gérer les erreurs
 from app.models.user import User       # Import du modèle SQLAlchemy User
 from sqlalchemy.orm import Session     # Import de BaseModel pour créer des schémas de validation de données
+from app.core.security import hash_password, verify_password, create_access_token
 
-def create_user_service(
-        db: Session,  # On reçoit la session DB
-        email: str
-) -> User:
+def create_user_service(db: Session, email: str, password: str) -> User: # On reçoit la session DB
     """
     Crée un utilisateur en base PostgreSQL.
 
@@ -24,7 +22,10 @@ def create_user_service(
             detail="Email déjà utilisé"
         )
 
-    new_user = User(email=email)    # Création de l'objet utilisateur (Pas un Dict)
+    hashed_password = hash_password(password)
+
+    new_user = User(email=email, password_hash=hashed_password)    # Création de l'objet utilisateur (Pas un Dict)
+
     db.add(new_user)                # Ajout en base
     db.commit()                     # Sauvegarde réelle en DB
     db.refresh(new_user)            # Recharge l'objet avec les données depuis la DB après commit (ex : id auto)
@@ -138,3 +139,23 @@ def update_user_service(db: Session, user_id: int, email: str | None ) -> User:
     db.refresh(user)    # Recharger l'objet apres la persistance
 
     return user
+
+def login_user_service(db: Session, email: str, password: str) -> str:
+
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid credentials"
+        )
+
+    if not verify_password(password, user.password_hash):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid credentials"
+        )
+
+    token = create_access_token({"sub": str(user.id)})
+
+    return token

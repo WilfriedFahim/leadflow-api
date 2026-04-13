@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends, Query                   # Import du router FastAPI pour organiser les endpoints (routes) liées aux utilisateurs
 from sqlalchemy.orm import Session                              # Import du type Session
-from app.schemas.user import UserCreate, UserRead, UserUpdate   # Import des schémas Pydantic pour la validation et la réponse
+from app.schemas.user import (                                  # Import des schémas Pydantic pour la validation et la réponse
+    UserCreate,
+    UserRead,
+    UserUpdate,
+    UserLogin,
+)
 from app.models.user import User                                # Mon modèle ORM
 from app.services.user_service import (                         # Import des services liés à la logique métier
     create_user_service,
@@ -90,7 +95,7 @@ def update_user(
         db: Session = Depends(get_db),
 ):
     """
-    Met à jour partielle d'un utilisateur.
+    Met à jour partiel d'un utilisateur.
     """
 
     return update_user_service(
@@ -98,3 +103,16 @@ def update_user(
         user_id=user_id,
         email=user.email,
     )
+
+@router.post("/login")
+def login(user: UserLogin, db: Session = Depends(get_db)):
+    """
+    Authentifie un utilisateur et renvoie un token JWT.
+    """
+    token = login_user_service(
+        db=db,
+        email=user.email,
+        password=user.password,
+    )
+
+    return {"access_token": token, "token_type": "bearer"}

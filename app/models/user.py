@@ -29,3 +29,8 @@ class User(Base):
         unique=True,    # unique=True empêche les doublons en base
         nullable=False  # nullable=False rend le champs obligatoire
     )
+
+    password_hash: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
